@@ -452,6 +452,8 @@ static inline bool gen_vec(enum arg rm, enum arg reg, void (*helper)(), gadget_t
 
 #define VLOAD(src, dst,z) v(load, src, dst,z)
 #define VSTORE(src, dst,z) v_write(store, src, dst,z)
+#define VCOMPARE(src, dst,z) v(compare, src, dst,z)
+#define VXOR(src, dst,z) v(xor, src, dst,z)
 
 #define DECODER_RET int
 #define DECODER_NAME gen_step
