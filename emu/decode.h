@@ -821,7 +821,10 @@ restart:
                     READINSN;
                     switch (insn) {
                         case 0x10: TRACEI("movss xmm:modrm, xmm");
-                                   READMODRM; VLOAD(xmm_modrm_val, xmm_modrm_reg,32);
+                                   READMODRM; VLOAD_PADMEM(xmm_modrm_val, xmm_modrm_reg,32);
+                                   break;
+                        case 0x11: TRACEI("movss xmm, xmm:modrm");
+                                   READMODRM; VSTORE(xmm_modrm_reg, xmm_modrm_val,32);
                                    break;
 
                         case 0x18 ... 0x1f: TRACEI("repz nop modrm\t"); READMODRM; break;
