@@ -451,12 +451,13 @@ static inline bool gen_vec(enum arg rm, enum arg reg, void (*helper)(), gadget_t
 #define v_write(op, src, dst,z) _v(arg_##dst, arg_##src, vec_##op##z, vec_helper_store##z##_gadgets, z)
 
 #define VLOAD(src, dst,z) v(load, src, dst,z)
+#define VZLOAD(src, dst,z) v_write(zload, dst, src,z)
 #define VLOAD_PADMEM(src, dst, z) do { \
-    printf("%d %d\n", src, dst); \
     if (arg_##src == arg_xmm_modrm_val && modrm.type != modrm_reg) { \
-        VXOR(dst, dst,128); \
+        VZLOAD(src, dst, z); \
+    } else { \
+        VLOAD(src, dst, z); \
     } \
-    VLOAD(src, dst, z); \
 } while (0)
 #define VSTORE(src, dst,z) v_write(store, src, dst,z)
 #define VCOMPARE(src, dst,z) v(compare, src, dst,z)
