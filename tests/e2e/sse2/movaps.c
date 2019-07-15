@@ -21,7 +21,7 @@ void main(void) {
 
 	// Move xmm2 onto xmm1
 	asm volatile(	"movaps %[vec2], %[vec1]\n\t"
-		: [vec1] "=x" (xmm1)
+		: [vec1] "+x" (xmm1)
 		: [vec2] "x" (xmm2));
 
 	_mm_store_ps((float*) out, xmm1);

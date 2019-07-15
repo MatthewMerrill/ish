@@ -37,15 +37,6 @@ void vec_load64(struct cpu_state *UNUSED(cpu), union xmm_reg *src, union xmm_reg
     dst->qw[0] = src->qw[0];
 }
 void vec_load128(struct cpu_state *UNUSED(cpu), union xmm_reg *src, union xmm_reg *dst) {
-            *((float*)&src->dw[0]),
-            *((float*)&src->dw[1]),
-            *((float*)&src->dw[2]),
-            *((float*)&src->dw[3]),
-            *((float*)&dst->dw[0]),
-            *((float*)&dst->dw[1]),
-            *((float*)&dst->dw[2]),
-            *((float*)&dst->dw[3])
-            );
     *dst = *src;
 }
 

@@ -103,6 +103,10 @@ restart:
                 case 0x4f: TRACEI("cmovnle modrm, reg");
                            READMODRM; CMOVN(LE, modrm_val, modrm_reg,oz); break;
 
+                case 0x57: TRACEI("xorps xmm, xmm:modrm");
+                           READMODRM; VXOR(xmm_modrm_val, xmm_modrm_reg,128);
+                           break;
+
                 case 0x80: TRACEI("jo rel\t");
                            READIMM; J_REL(O, imm); break;
                 case 0x81: TRACEI("jno rel\t");

@@ -25,8 +25,8 @@ void main(void) {
 	printout();
 
     //move5(&xmm1, &xmm2);
-	//xmm1 = _mm_move_ss(xmm1, xmm2);
-	_mm_store_ps((float*) out, _mm_move_ss(xmm1, xmm2));
+	__m128 xmm3 = _mm_move_ss(xmm1, xmm2);
+	_mm_store_ps((float*) out, xmm3);
     printout();
 
     move1612(&xmm1, fa);
