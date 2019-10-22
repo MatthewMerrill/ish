@@ -291,6 +291,8 @@ restart:
                 case 0xcf: TRACEI("bswap edi");
                            BSWAP(reg_di); break;
 #endif
+                case 0xd4: TRACEI("paddq xmm:modrm xmm");
+                           READMODRM; VADD(xmm_modrm_val, xmm_modrm_reg,64);
                 case 0xd6: TRACEI("movq xmm xmm:modrm");
                            READMODRM; VSTORE_PADNOTMEM(xmm_modrm_reg, xmm_modrm_val,64); break;
 

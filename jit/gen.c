@@ -530,6 +530,8 @@ static inline bool gen_vec(enum arg rm, enum arg reg, void (*helper)(), gadget_t
         v_write(store, src, dst,z); \
     } \
 } while (0)
+
+#define VADD(src, dst,z) v(add, src, dst,z)
 #define VCOMPARE(src, dst,z) v(compare, src, dst,z)
 #define VSHIFTL_IMM(reg, amount, z) v_imm(imm_shiftl, amount, reg,z)
 #define VSHIFTR_IMM(reg, amount, z) v_imm(imm_shiftr, amount, reg,z)
