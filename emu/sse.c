@@ -124,6 +124,15 @@ void vec_add64(struct cpu_state *UNUSED(cpu), const union xmm_reg *arg, union xm
     dst->u64[0] += arg->u64[0];
 }
 
+void vec_muls64(struct cpu_state *UNUSED(cpu), const union xmm_reg *arg, union xmm_reg *dst) {
+    dst->df[0] *= arg->df[0];
+}
+
+void vec_and128(struct cpu_state *UNUSED(cpu), const union xmm_reg *arg, union xmm_reg *dst) {
+    dst->qw[0] &= arg->qw[0];
+    dst->qw[1] &= arg->qw[1];
+}
+
 void vec_or128(struct cpu_state *UNUSED(cpu), const union xmm_reg *arg, union xmm_reg *dst) {
     dst->qw[0] |= arg->qw[0];
     dst->qw[1] |= arg->qw[1];

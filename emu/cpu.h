@@ -20,6 +20,10 @@ union xmm_reg {
     uint32_t u32[4];
     uint16_t u16[8];
     uint8_t u8[16];
+
+    float sf[4];
+    double df[2];
+    
     // TODO more forms
 };
 

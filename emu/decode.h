@@ -103,13 +103,13 @@ restart:
                 case 0x4f: TRACEI("cmovnle modrm, reg");
                            READMODRM; CMOVN(LE, modrm_val, modrm_reg,oz); break;
 
+                // TODO: Rewrite all the SSE in either Intel or ATT
+                case 0x54: TRACEI("andps xmm:modrm xmm");
+                           READMODRM; VAND(xmm_modrm_val, xmm_modrm_reg,128); break;
                 case 0x56: TRACEI("orpd xmm, xmm:modrm");
-                           READMODRM; VOR(xmm_modrm_val, xmm_modrm_reg,128);
-                           break;
-
+                           READMODRM; VOR(xmm_modrm_val, xmm_modrm_reg,128); break;
                 case 0x57: TRACEI("xorps xmm, xmm:modrm");
-                           READMODRM; VXOR(xmm_modrm_val, xmm_modrm_reg,128);
-                           break;
+                           READMODRM; VXOR(xmm_modrm_val, xmm_modrm_reg,128); break;
 
                 case 0x6e: TRACEI("movd modrm, xmm");
                            // TODO: REX.W = 1 might be needed later
@@ -855,6 +855,10 @@ restart:
                                    break;
 
                         case 0x18 ... 0x1f: TRACEI("rep nop modrm\t"); READMODRM; break;
+
+                        case 0x59: TRACEI("mulsd xmm:modrm xmm");
+                                   READMODRM; VMULS(xmm_modrm_val, xmm_modrm_reg,64); break;
+
                         default: TRACE("undefined"); UNDEFINED;
                     }
                     break;
