@@ -93,6 +93,15 @@ ZSTORE(64)
 ZSTORE(128)
 #undef ZSTORE
 
+void vec_imm_shiftl64(struct cpu_state *UNUSED(cpu), const uint8_t amount, union xmm_reg *src) {
+    if (amount > 63) {
+        zero_xmm(src);
+    } else {
+        src->qw[0] <<= amount;
+        src->qw[1] <<= amount;
+    }
+}
+
 void vec_imm_shiftr64(struct cpu_state *UNUSED(cpu), const uint8_t amount, union xmm_reg *src) {
     if (amount > 63) {
         zero_xmm(src);
