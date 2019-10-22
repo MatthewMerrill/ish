@@ -133,6 +133,8 @@ restart:
 #if OP_SIZE != 32
                 case 0x74: TRACEI("pcmpeqb xmm:modrm, xmm");
                            READMODRM; VCOMPARE_EACH(xmm_modrm_val, xmm_modrm_reg,8); break;
+                case 0x76: TRACEI("pcmpeqd xmm:modrm, xmm");
+                           READMODRM; VCOMPARE_EACH(xmm_modrm_val, xmm_modrm_reg,32); break;
 #endif
 
                 case 0x7e: TRACEI("movd xmm, modrm");

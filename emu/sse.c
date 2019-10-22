@@ -40,6 +40,11 @@ void vec_compare_each8(struct cpu_state *UNUSED(cpu), const union xmm_reg *cmp, 
         dst->u8[pos] = (dst->u8[pos] == cmp->u8[pos]) ? 0xFF : 0x00;
     }
 }
+void vec_compare_each32(struct cpu_state *UNUSED(cpu), const union xmm_reg *cmp, union xmm_reg *dst) {
+    for (int pos = 0; pos < 4; ++pos) {
+        dst->u32[pos] = (dst->u32[pos] == cmp->u32[pos]) ? 0xFFFFFFFF : 0x00000000;
+    }
+}
 
 void vec_movmsk8(struct cpu_state *UNUSED(cpu), uint32_t *dst, const union xmm_reg *src) {
     *dst = 0;
