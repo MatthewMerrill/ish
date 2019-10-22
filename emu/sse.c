@@ -97,8 +97,8 @@ void vec_imm_shiftl64(struct cpu_state *UNUSED(cpu), const uint8_t amount, union
     if (amount > 63) {
         zero_xmm(src);
     } else {
-        src->qw[0] <<= amount;
-        src->qw[1] <<= amount;
+        src->u64[0] <<= amount;
+        src->u64[1] <<= amount;
     }
 }
 
@@ -106,13 +106,13 @@ void vec_imm_shiftr64(struct cpu_state *UNUSED(cpu), const uint8_t amount, union
     if (amount > 63) {
         zero_xmm(src);
     } else {
-        src->qw[0] >>= amount;
-        src->qw[1] >>= amount;
+        src->u64[0] >>= amount;
+        src->u64[1] >>= amount;
     }
 }
 
 void vec_add64(struct cpu_state *UNUSED(cpu), const union xmm_reg *arg, union xmm_reg *dst) {
-    dst->qw[0] += arg->qw[0];
+    dst->u64[0] += arg->u64[0];
 }
 
 void vec_or128(struct cpu_state *UNUSED(cpu), const union xmm_reg *arg, union xmm_reg *dst) {

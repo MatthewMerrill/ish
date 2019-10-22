@@ -125,6 +125,7 @@ restart:
                                           READIMM8; VSHIFTR_IMM(xmm_modrm_val, imm,64); break;
                                case 0x06: TRACEI("psllq xmm imm");
                                           READIMM8; VSHIFTL_IMM(xmm_modrm_val, imm,64); break;
+
                                default: UNDEFINED;
                            }
                            break;
@@ -292,7 +293,7 @@ restart:
                            BSWAP(reg_di); break;
 #endif
                 case 0xd4: TRACEI("paddq xmm:modrm xmm");
-                           READMODRM; VADD(xmm_modrm_val, xmm_modrm_reg,64);
+                           READMODRM; VADD(xmm_modrm_val, xmm_modrm_reg,64); break;
                 case 0xd6: TRACEI("movq xmm xmm:modrm");
                            READMODRM; VSTORE_PADNOTMEM(xmm_modrm_reg, xmm_modrm_val,64); break;
 
