@@ -111,6 +111,15 @@ void vec_imm_shiftr64(struct cpu_state *UNUSED(cpu), const uint8_t amount, union
     }
 }
 
+void vec_shiftr64(struct cpu_state *UNUSED(cpu), const union xmm_reg *arg, union xmm_reg *dst) {
+    if (arg->u64[0] > 63) {
+        zero_xmm(dst);
+    } else {
+        dst->u64[0] >>= arg->u64[0];
+        dst->u64[1] >>= arg->u64[0];
+    }
+}
+
 void vec_add64(struct cpu_state *UNUSED(cpu), const union xmm_reg *arg, union xmm_reg *dst) {
     dst->u64[0] += arg->u64[0];
 }

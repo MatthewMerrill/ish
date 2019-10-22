@@ -533,11 +533,12 @@ static inline bool gen_vec(enum arg rm, enum arg reg, void (*helper)(), gadget_t
 
 #define VADD(src, dst,z) v(add, src, dst,z)
 #define VCOMPARE(src, dst,z) v(compare, src, dst,z)
-#define VSHIFTL_IMM(reg, amount, z) v_imm(imm_shiftl, amount, reg,z)
-#define VSHIFTR_IMM(reg, amount, z) v_imm(imm_shiftr, amount, reg,z)
 #define VCOMPARE_EACH(src, dst,z) v(compare_each, src, dst,z)
 #define VMOVMSK(src, dst,z) v(movmsk, src, dst,z)
 #define VOR(src, dst,z) v(or, src, dst,z)
+#define VSHIFTL_IMM(reg, amount, z) v_imm(imm_shiftl, amount, reg,z)
+#define VSHIFTR(arg, dst, z) v(shiftr, arg, dst,z)
+#define VSHIFTR_IMM(reg, amount, z) v_imm(imm_shiftr, amount, reg,z)
 #define VXOR(src, dst,z) v(xor, src, dst,z)
 
 #define DECODER_RET int
