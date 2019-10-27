@@ -118,50 +118,73 @@ do_helper 2
 # sync with enum vec_arg
 #define VEC_ARG_LIST xmm,reg,imm
 
-.macro do_vec_helper name, reg, rm, size=
+.macro do_vec_helper name, arg0, arg1, size=
     .gadget vec_helper_\name
-        .ifin(\rm, read,write)
-            \rm\()_prep (\size), vec_helper_\name
+        .ifin(\arg0, read,write)
+            \arg0\()_prep (\size), vec_helper_\name
         .endifin
         save_regs
         save_c
         movq %_cpu, %rdi
         xorq %r14, %r14
-        .ifin(\rm, xmm)
-            movb 8(%_ip), %r14b
-            leaq CPU_xmm(%_cpu,%r14), %rdx
-            movb 9(%_ip), %r14b
-            leaq CPU_xmm(%_cpu,%r14), %rsi
+
+        .ifin(\arg0, xmm,reg,imm)
+            .ifin(\arg0, xmm)
+                movb 8(%_ip), %r14b
+                leaq CPU_xmm(%_cpu,%r14), %rsi
+            .endifin
+            .ifin(\arg0, reg)
+                movb 8(%_ip), %r14b
+                leaq (%_cpu,%r14), %rsi
+            .endifin
+            .ifin(\arg0, imm)
+                xorq %rsi, %rsi
+                movb 8(%_ip), %sil
+            .endifin
+
+            .ifin(\arg1, xmm)
+                movb 12(%_ip), %r14b
+                leaq CPU_xmm(%_cpu,%r14), %rdx
+            .endifin
+            .ifin(\arg1, reg)
+                movb 12(%_ip), %r14b
+                leaq (%_cpu,%r14), %rdx
+            .endifin
+            .ifin(\arg1, imm)
+                xorq %rdx, %rdx
+                movb 12(%_ip), %dxl
+            .endifin
+
             callq *(%_ip)
         .endifin
-        .ifin(\rm, reg)
-            movb 8(%_ip), %r14b
-            leaq CPU_xmm(%_cpu,%r14), %rdx
-            movb 9(%_ip), %r14b
-            leaq CPU_ebx(%_cpu,%r14), %rsi # I don't know why this has to be ebx instead of eax
-            callq *(%_ip)
-        .endifin
-        .ifin(\rm, read,write)
-            movb 16(%_ip), %r14b
-            leaq CPU_xmm(%_cpu,%r14), %rdx
+
+        .ifin(\arg0, read,write)
             movq %_addrq, %rsi
+            .ifin(\arg1, xmm)
+                movb 20(%_ip), %r14b
+                leaq CPU_xmm(%_cpu,%r14), %rdx
+            .endifin
+            .ifin(\arg1, reg)
+                movb 20(%_ip), %r14b
+                leaq (%_cpu,%r14), %rdx
+            .endifin
+            .ifin(\arg1, imm)
+                xorq %rdx, %rdx
+                movb 20(%_ip), %dxl
+            .endifin
+
             callq *8(%_ip)
         .endifin
-        .ifin(\rm, imm)
-            movb 8(%_ip), %r14b
-            leaq CPU_xmm(%_cpu,%r14), %rdx
-            movb 9(%_ip), %sil
-            callq *(%_ip)
-        .endifin
+
         restore_c
         load_regs
-        .ifc \rm,write
+        .ifin (\arg0 write)
             write_done (\size), vec_helper_\name
-        .endif
-        .ifin(\rm, xmm,reg,imm)
+        .endifin
+        .ifin(\arg0, xmm,reg,imm)
             gret 2
         .endifin
-        .ifin(\rm, read,write)
+        .ifin(\arg0, read,write)
             gret 3
         .endifin
 .endm
@@ -176,8 +199,8 @@ do_helper 2
 
 .irp size, SIZE_LIST,64,128
     .irp arg, VEC_ARG_LIST
-        do_vec_helper load\size\()_\arg, \arg, read, \size
-        do_vec_helper store\size\()_\arg, \arg, write, \size
+        do_vec_helper load\size\()_\arg, read, \arg, \size
+        do_vec_helper store\size\()_\arg, write, \arg, \size
     .endr
     .gadget_list vec_helper_load\size\(), VEC_ARG_LIST
     .gadget_list vec_helper_store\size\(), VEC_ARG_LIST

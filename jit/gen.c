@@ -5,6 +5,7 @@
 #include "emu/fpu.h"
 #include "emu/sse.h"
 #include "emu/interrupt.h"
+#include "emu/regid.h"
 
 static void gen(struct gen_state *state, unsigned long thing) {
     assert(state->size <= state->capacity);
@@ -430,8 +431,11 @@ static inline enum vec_arg vecarg(enum arg arg, struct modrm *modrm) {
         case arg_xmm_modrm_reg:
             return vec_arg_xmm;
         case arg_modrm_val:
-            if (modrm->type == modrm_reg)
+            if (modrm->type == modrm_reg) {
+                printf("qq it's a reg\n");
                 return vec_arg_reg;
+            }
+            printf("it's a mem\n");
             return vec_arg_mem;
         case arg_xmm_modrm_val:
             if (modrm->type == modrm_reg)
@@ -442,55 +446,69 @@ static inline enum vec_arg vecarg(enum arg arg, struct modrm *modrm) {
     }
 }
 
-static inline bool gen_vec(enum arg rm, enum arg reg, void (*helper)(), gadget_t (*helper_gadgets_mem)[vec_arg_count], struct gen_state *state, struct modrm *modrm, uint8_t imm, dword_t saved_ip, bool seg_gs) {
-    enum vec_arg v_reg = vecarg(reg, modrm);
-    enum vec_arg v_rm = vecarg(rm, modrm);
-
-    gadget_t gadget;
-    if (v_rm == vec_arg_mem) {
-        gadget = (*helper_gadgets_mem)[v_reg];
-    } else {
-        extern gadget_t vec_helper_reg_gadgets[vec_arg_count][vec_arg_count];
-        gadget = vec_helper_reg_gadgets[v_reg][v_rm];
-    }
-    if (gadget == NULL) {
-        UNDEFINED;
-    }
-
-    switch (v_rm) {
-        case vec_arg_reg:
-            GEN(gadget);
-            GEN(helper);
-            // if register size increases this should too
-            GEN((modrm->rm_opcode * sizeof(union xmm_reg))
-                    | ((modrm->opcode * sizeof(uint32_t)) << 8));
-            break;
-
+static inline uint32_t gen_vec_arg(enum arg arg, enum vec_arg v_arg, struct modrm *modrm, uint8_t imm) {
+    switch (v_arg) {
         case vec_arg_xmm:
-            GEN(gadget);
-            GEN(helper);
-            GEN((modrm->opcode * sizeof(union xmm_reg))
-                    | (modrm->rm_opcode * sizeof(union xmm_reg) << 8));
-            break;
+            return ((arg == arg_xmm_modrm_val)
+                    ? modrm->rm_opcode
+                    : modrm->opcode)
+                * sizeof(union xmm_reg);
 
-        case vec_arg_mem:
-            gen_addr(state, modrm, seg_gs, saved_ip);
-            GEN(gadget);
-            GEN(saved_ip);
-            GEN(helper);
-            GEN(modrm->opcode * sizeof(union xmm_reg));
-            break;
+        case vec_arg_reg:
+            // Size of one register in emu/cpu.h
+            return regptr_from_reg(
+                    (arg == arg_modrm_val)
+                        ? modrm->rm_opcode
+                        : modrm->opcode)
+                .reg32_id;
 
         case vec_arg_imm:
-            // TODO: support immediates and opcode
-            GEN(gadget);
-            GEN(helper);
-            GEN((modrm->rm_opcode * sizeof(union xmm_reg))
-                    | (((uint16_t) imm) << 8));
-            break;
+            return (uint32_t) imm;
 
-        default: die("unimplemented vecarg");
+        case vec_arg_mem: die("mem stuff should not be getting here"); return 0;
+        default: die("unimplemented vecarg"); return 0;
     }
+}
+
+static inline bool gen_vec(enum arg arg0, enum arg arg1, void (*helper)(), gadget_t (*helper_gadgets_mem)[vec_arg_count], struct gen_state *state, struct modrm *modrm, uint8_t imm, dword_t saved_ip, bool seg_gs) {
+    enum vec_arg v_arg0 = vecarg(arg0, modrm);
+    enum vec_arg v_arg1 = vecarg(arg1, modrm);
+    if (arg1 == vec_arg_mem) {
+        die("mem not allowed as arg1 of gen_vec");
+    }
+    if ((arg0 == arg_modrm_val || arg0 == arg_xmm_modrm_val)
+            && (arg1 == arg_modrm_val || arg1 == arg_xmm_modrm_val)) {
+        die("Both gen_vec arguments depend on the rm_opcode value");
+    }
+    if ((arg0 == arg_modrm_reg || arg0 == arg_xmm_modrm_reg)
+            && (arg1 == arg_modrm_reg || arg1 == arg_xmm_modrm_reg)) {
+        die("Both gen_vec arguments depend on the opcode value");
+    }
+
+
+    gadget_t gadget;
+    if (v_arg0 == vec_arg_mem) {
+        gadget = (*helper_gadgets_mem)[v_arg1];
+    } else {
+        extern gadget_t vec_helper_reg_gadgets[vec_arg_count][vec_arg_count];
+        gadget = vec_helper_reg_gadgets[v_arg0][v_arg1];
+    }
+    if (gadget == NULL) {
+        die("could not load gen_vec gadget");
+    }
+
+    uint64_t arg_buf = 0;
+    if (v_arg0 == vec_arg_mem) {
+        gen_addr(state, modrm, seg_gs, saved_ip);
+        GEN(gadget);
+        GEN(saved_ip);
+    } else {
+        GEN(gadget);
+        arg_buf |= gen_vec_arg(arg0, v_arg0, modrm, imm);
+    }
+    GEN(helper);
+    arg_buf |= ((uint64_t) gen_vec_arg(arg1, v_arg1, modrm, imm)) << 32;
+    GEN(arg_buf);
     return true;
 }
 

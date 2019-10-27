@@ -26,4 +26,6 @@ void main(void) {
 
 	_mm_store_ps((float*) out, xmm1);
     printout();
+	_mm_store_ps((float*) out, xmm2);
+    printout();
 } 
