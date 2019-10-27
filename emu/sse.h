@@ -6,21 +6,17 @@
 void vec_compare32(struct cpu_state *UNUSED(cpu), float *f2, float *f1);
 
 /**
- * Argument ordering swaps back and forth because laziness has taken
- * precedence over actual quality. To minimize gadget complicatedness,
- * the second argument is always an XMM. If either arg is memory, the
- * first one is.
+ * If either arg is memory, the mem arg must be in the first position.
  *
- * Corresponding with jit/gen.c:
+ * Convention:
  * =============================
- * - If v(...) is being used, the first argument is source.
- * - If v_write(...) is being used, the first argument is being written to.
- * Because the first argument is the operand that might be memory.
+ * - If and only if the helper must write to memory, use v_write(...).
+ * - Make args const unless absolutely necessary.
  * 
- *  jit/gen method | arg order
- * ----------------|------------
- *  v()            | const a, b    
- *  v_write()      | a, const b
+ *  writes to mem | jit/gen method | arg order
+ * ---------------|----------------|------------
+ *  No            | v()            | const a, b    
+ *  Yes           | v_write()      | a, const b
  */
 
 void vec_compare_each8(struct cpu_state *UNUSED(cpu), const union xmm_reg *cmp, union xmm_reg *dst);
