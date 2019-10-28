@@ -139,14 +139,7 @@ restart:
 
                 case 0x7e: TRACEI("movd xmm, modrm");
                            // TODO: REX.W = 1 might be needed later
-                           READMODRM;
-                           if (modrm.type == modrm_reg) {
-                               printf("movd to %s\n",  reg32_name(modrm.rm_opcode));
-                           }
-                           else {
-                               printf("movd to mem?\n");
-                           }
-                           VSTORE(xmm_modrm_reg, modrm_val,32);
+                           READMODRM; VSTORE(xmm_modrm_reg, modrm_val,32);
                            break;
 
                 case 0x7f: TRACEI("movdqa xmm, xmm:modrm");

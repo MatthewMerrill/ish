@@ -129,58 +129,58 @@ do_helper 2
         xorq %r14, %r14
 
         .ifin(\arg0, xmm,reg,imm)
-            .ifin(\arg0, xmm)
+            .ifc \arg0,xmm
                 movb 8(%_ip), %r14b
                 leaq CPU_xmm(%_cpu,%r14), %rsi
-            .endifin
-            .ifin(\arg0, reg)
+            .endif
+            .ifc \arg0,reg
                 movb 8(%_ip), %r14b
                 leaq (%_cpu,%r14), %rsi
-            .endifin
-            .ifin(\arg0, imm)
+            .endif
+            .ifc \arg0,imm
                 xorq %rsi, %rsi
                 movb 8(%_ip), %sil
-            .endifin
+            .endif
 
-            .ifin(\arg1, xmm)
+            .ifc \arg1,xmm
                 movb 12(%_ip), %r14b
                 leaq CPU_xmm(%_cpu,%r14), %rdx
-            .endifin
-            .ifin(\arg1, reg)
+            .endif
+            .ifc \arg1,reg
                 movb 12(%_ip), %r14b
                 leaq (%_cpu,%r14), %rdx
-            .endifin
-            .ifin(\arg1, imm)
+            .endif
+            .ifc \arg1,imm
                 xorq %rdx, %rdx
                 movb 12(%_ip), %dxl
-            .endifin
+            .endif
 
             callq *(%_ip)
         .endifin
 
         .ifin(\arg0, read,write)
             movq %_addrq, %rsi
-            .ifin(\arg1, xmm)
+            .ifc \arg1,xmm
                 movb 20(%_ip), %r14b
                 leaq CPU_xmm(%_cpu,%r14), %rdx
-            .endifin
-            .ifin(\arg1, reg)
+            .endif
+            .ifc \arg1,reg
                 movb 20(%_ip), %r14b
                 leaq (%_cpu,%r14), %rdx
-            .endifin
-            .ifin(\arg1, imm)
+            .endif
+            .ifc \arg1,imm
                 xorq %rdx, %rdx
                 movb 20(%_ip), %dxl
-            .endifin
+            .endif
 
             callq *8(%_ip)
         .endifin
 
         restore_c
         load_regs
-        .ifin (\arg0 write)
+        .ifc \arg0,write
             write_done (\size), vec_helper_\name
-        .endifin
+        .endif
         .ifin(\arg0, xmm,reg,imm)
             gret 2
         .endifin

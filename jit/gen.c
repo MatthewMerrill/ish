@@ -431,11 +431,8 @@ static inline enum vec_arg vecarg(enum arg arg, struct modrm *modrm) {
         case arg_xmm_modrm_reg:
             return vec_arg_xmm;
         case arg_modrm_val:
-            if (modrm->type == modrm_reg) {
-                printf("qq it's a reg\n");
+            if (modrm->type == modrm_reg)
                 return vec_arg_reg;
-            }
-            printf("it's a mem\n");
             return vec_arg_mem;
         case arg_xmm_modrm_val:
             if (modrm->type == modrm_reg)
